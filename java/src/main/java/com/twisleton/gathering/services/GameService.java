@@ -1,23 +1,29 @@
 package com.twisleton.gathering.services;
 
+import com.google.gson.Gson;
+import com.twisleton.gathering.records.Message;
 import com.twisleton.gathering.records.User;
 import com.twisleton.gathering.records.World;
 import com.twisleton.gathering.server.GatheringServer;
+import org.java_websocket.WebSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.awt.*;
+import java.time.Instant;
 import java.util.HashMap;
+import java.util.Optional;
 
 @Service
 public class GameService {
 
-    private Logger logger = LoggerFactory.getLogger(GatheringServer.class);
-    private World world;
+    private final Logger logger = LoggerFactory.getLogger(GatheringServer.class);
+    private final World world;
     private final int worldMaxXCoordinate;
     private final int worldMaxYCoordinate;
+    private final Gson gson = new Gson();
 
     public GameService(@Value("${world.x.limit:100}") int worldMaxXCoordinate,
                        @Value("${world.y.limit:100}") int worldMaxYCoordinate) {
@@ -29,18 +35,40 @@ public class GameService {
                 new HashMap<String, User>());
     }
 
-    public World getWorld() {
-        return world;
+    public void handleUserConnection(WebSocket socket) {
+        String id = socket.getRemoteSocketAddress().getHostString();
+        if (world.users().isEmpty()) {
+            handleNewUser(id);
+        } else {
+            Optional<User> optionalExistingUser = Optional.of(world.users().get(id));
+            optionalExistingUser.ifPresentOrElse(this::handleExistingUser, () -> {
+                handleNewUser(id);
+            });
+        }
+        socket.send(gson.toJson(new Message("world", world)));
     }
 
-    public User createUser(String id) {
-        User user = new User(id, generateRandomCoordinate());
-        world.users().put(id, user);
-        logger.info("User {} added!", user.id());
-        return user;
+    public void handleMessage(WebSocket socket) {
+        Message message = new Message("pong", "Message received, my ID is " + socket.getLocalSocketAddress().toString());
+        socket.send(gson.toJson(message));
     }
 
-    private Point generateRandomCoordinate() {
-        return new Point((int) ((Math.random() * (worldMaxXCoordinate - 0)) + 0), (int) ((Math.random() * (worldMaxXCoordinate - 0)) + 0));
+    private void handleExistingUser(User user) {
+        User existingUserWithUpdatedConnectionTime =
+                new User(user.id(), user.position(), Instant.now().toString());
+        world.users().put(user.id(), existingUserWithUpdatedConnectionTime);
+        logger.info("User {} connected at {}, last connection was {}",
+                user.id(),
+                existingUserWithUpdatedConnectionTime.lastConnectionTime(),
+                user.lastConnectionTime());
+    }
+
+    private void handleNewUser(String id) {
+        world.users().put(id, new User(id, generateRandomCoordinates(), Instant.now().toString()));
+        logger.info("User {} added to world!", id);
+    }
+
+    private Point generateRandomCoordinates() {
+        return new Point((int) ((Math.random() * (worldMaxXCoordinate)) + 0), (int) ((Math.random() * (worldMaxYCoordinate)) + 0));
     }
 }
