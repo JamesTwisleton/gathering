@@ -48,9 +48,15 @@ public class GameService {
         socket.send(gson.toJson(new Message("world", world)));
     }
 
-    public void handleMessage(WebSocket socket) {
-        Message message = new Message("pong", "Message received, my ID is " + socket.getLocalSocketAddress().toString());
-        socket.send(gson.toJson(message));
+    public void handleMessage(WebSocket socket, String message) {
+        Message pong = new Message("pong", "Message received, my ID is " + socket.getLocalSocketAddress().toString());
+        socket.send(gson.toJson(pong));
+        Message received = gson.fromJson(message, Message.class);
+        if(received.id().equals("move")) {
+            logger.info("movement request received!");
+        } else {
+            logger.info("unknown request received: {}", received.id());
+        }
     }
 
     private void handleExistingUser(User user) {

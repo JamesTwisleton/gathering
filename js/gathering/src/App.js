@@ -1,11 +1,14 @@
 function App() {
   let socket = new WebSocket('ws://localhost:42069');
   let payload = {user: "me", message: "hello sockets"};
-  socket.onopen = () => socket.send('Client is here!');
+  socket.onopen = () => {
+    // socket.send('Client is here!');
+    socket.send('{"id": "move","message":{"direction":"left"}}');
+  }
   socket.onmessage = (message) => {
     console.log(message);
     let parsed = JSON.parse(message.data);
-    console.log('message received', parsed); 
+    console.log('message received', parsed);
     // handle message from backend
 }
   return 'client is running';

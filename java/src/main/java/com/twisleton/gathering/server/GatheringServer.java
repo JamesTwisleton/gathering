@@ -38,8 +38,8 @@ public class GatheringServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket webSocket, String s) {
-        logger.info("Message received:  {}", s);
-        gameService.handleMessage(webSocket);
+        logger.info("Message received from {}:  {}", webSocket.getRemoteSocketAddress(), s);
+        gameService.handleMessage(webSocket, s);
     }
 
     @Override
