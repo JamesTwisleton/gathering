@@ -3,7 +3,8 @@ function App() {
   let payload = {user: "me", message: "hello sockets"};
   socket.onopen = () => {
     // socket.send('Client is here!');
-    socket.send('{"id": "move","message":"LEFT"}');
+    socket.send('{"id": "move","message":"RIGHT"}');
+    // socket.send('{"id": "move","message":"UP"}');
   }
   socket.onmessage = (message) => {
     console.log(message);
