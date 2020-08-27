@@ -77,7 +77,6 @@ public class GameService {
             } else {
                 movePlayer(user.get(), direction);
             }
-            logger.info("direction requested is {}", direction);
         } else {
             logger.info("unknown request received: {}", received.id());
         }
