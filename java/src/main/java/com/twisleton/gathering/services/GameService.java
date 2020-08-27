@@ -72,8 +72,6 @@ public class GameService {
     }
 
     public void handleMessage(WebSocket socket, String received) {
-        Message pong = new Message("pong", "Message received, my ID is " + socket.getLocalSocketAddress().toString());
-        socket.send(gson.toJson(pong));
         Message message = gson.fromJson(received, Message.class);
         if (message.id().equals("move")) {
             handleMovement(socket, message);

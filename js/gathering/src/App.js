@@ -1,4 +1,3 @@
-import React from 'react';
 import { Canvas } from './Canvas';
 function App() {
   let socket = new WebSocket('ws://localhost:42069');
@@ -7,6 +6,7 @@ function App() {
   }
   socket.onmessage = (message) => {
     let parsed = JSON.parse(message.data);
+    console.log(parsed.message.users);
   }
   return Canvas();
 }
