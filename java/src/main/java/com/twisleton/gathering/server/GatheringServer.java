@@ -1,7 +1,5 @@
 package com.twisleton.gathering.server;
 
-import com.google.gson.Gson;
-import com.twisleton.gathering.records.Message;
 import com.twisleton.gathering.services.GameService;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -17,9 +15,8 @@ import java.net.InetSocketAddress;
 @Service
 public class GatheringServer extends WebSocketServer {
 
-    private Logger logger = LoggerFactory.getLogger(GatheringServer.class);
-    private GameService gameService;
-    private Gson gson = new Gson();
+    private final Logger logger = LoggerFactory.getLogger(GatheringServer.class);
+    private final GameService gameService;
 
     public GatheringServer(@Value("${port.number:42069}") int port,
                            @Autowired GameService gameService) {
@@ -31,8 +28,7 @@ public class GatheringServer extends WebSocketServer {
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         logger.info("Connection opened from {}", webSocket.getRemoteSocketAddress());
-        gameService.createUser(webSocket.getRemoteSocketAddress().getHostString());
-        webSocket.send(gson.toJson(new Message("world", gameService.getWorld())));
+        gameService.handleUserConnection(webSocket);
     }
 
     @Override
@@ -43,13 +39,12 @@ public class GatheringServer extends WebSocketServer {
     @Override
     public void onMessage(WebSocket webSocket, String s) {
         logger.info("Message received:  {}", s);
-        Message message = new Message("0", "Message received, my ID is " + webSocket.getLocalSocketAddress().toString());
-        webSocket.send(gson.toJson(message));
+        gameService.handleMessage(webSocket);
     }
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-        logger.info("There was a bloody error wasnt there {}", e);
+        logger.info("Oopsie Woopsie you did a real fucky wucky, now you have to get in the f o r e v e r box: ", e);
     }
 
     @Override
