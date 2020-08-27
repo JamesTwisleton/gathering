@@ -34,6 +34,7 @@ public class GatheringServer extends WebSocketServer {
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
         logger.info("Connection {} closed", i);
+        gameService.handleUserDisconnection(webSocket);
     }
 
     @Override
