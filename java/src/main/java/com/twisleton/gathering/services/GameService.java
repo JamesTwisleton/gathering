@@ -1,6 +1,7 @@
 package com.twisleton.gathering.services;
 
 import com.google.gson.Gson;
+import com.twisleton.gathering.records.Direction;
 import com.twisleton.gathering.records.Message;
 import com.twisleton.gathering.records.User;
 import com.twisleton.gathering.records.World;
@@ -48,15 +49,9 @@ public class GameService {
         socket.send(gson.toJson(new Message("world", world)));
     }
 
-    public void handleMessage(WebSocket socket, String message) {
-        Message pong = new Message("pong", "Message received, my ID is " + socket.getLocalSocketAddress().toString());
-        socket.send(gson.toJson(pong));
-        Message received = gson.fromJson(message, Message.class);
-        if(received.id().equals("move")) {
-            logger.info("movement request received!");
-        } else {
-            logger.info("unknown request received: {}", received.id());
-        }
+    private void handleNewUser(String id) {
+        world.users().put(id, new User(id, generateRandomCoordinates(), Instant.now().toString()));
+        logger.info("User {} added to world!", id);
     }
 
     private void handleExistingUser(User user) {
@@ -69,9 +64,27 @@ public class GameService {
                 user.lastConnectionTime());
     }
 
-    private void handleNewUser(String id) {
-        world.users().put(id, new User(id, generateRandomCoordinates(), Instant.now().toString()));
-        logger.info("User {} added to world!", id);
+    public void handleMessage(WebSocket socket, String message) {
+        Message pong = new Message("pong", "Message received, my ID is " + socket.getLocalSocketAddress().toString());
+        socket.send(gson.toJson(pong));
+        Message received = gson.fromJson(message, Message.class);
+        if (received.id().equals("move")) {
+            Optional<User> user = Optional.of(world.users().get(socket.getRemoteSocketAddress().getHostString()));
+            logger.info("movement request received!");
+            Direction direction = Direction.valueOf((String) received.message());
+            if(user.isEmpty()) {
+                handleNewUser(socket.getRemoteSocketAddress().getHostString());
+            } else {
+                movePlayer(user.get(), direction);
+            }
+            logger.info("direction requested is {}", direction);
+        } else {
+            logger.info("unknown request received: {}", received.id());
+        }
+    }
+
+    private void movePlayer(User user, Direction direction) {
+        logger.info("Moving User: {} in direction: {}", user.id(), direction);
     }
 
     private Point generateRandomCoordinates() {
