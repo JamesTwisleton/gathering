@@ -1,4 +1,4 @@
-package com.twisleton.gathering.records;
+package com.twisleton.gathering.dtos;
 
 public enum Direction {
     UP,DOWN,LEFT,RIGHT
