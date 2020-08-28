@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 
 @Service
@@ -23,6 +25,11 @@ public class GatheringServer extends WebSocketServer {
         super(new InetSocketAddress(port));
         this.gameService = gameService;
         this.start();
+    }
+
+    @PreDestroy
+    public void stopServerOnShutdown() throws IOException, InterruptedException {
+        this.stop();
     }
 
     @Override
@@ -45,7 +52,9 @@ public class GatheringServer extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-        logger.info("Oopsie Woopsie you did a real fucky wucky, now you have to get in the f o r e v e r box: ", e);
+        logger.info(
+                "Oopsie Woopsie you did a real fucky wucky, now you have to get in the f o r e v e r box: ",
+                e);
     }
 
     @Override

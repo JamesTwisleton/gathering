@@ -1,10 +1,11 @@
 package com.twisleton.gathering.services;
 
 import com.google.gson.Gson;
-import com.twisleton.gathering.records.Direction;
-import com.twisleton.gathering.records.Message;
-import com.twisleton.gathering.records.User;
-import com.twisleton.gathering.records.World;
+import com.twisleton.gathering.dtos.Direction;
+import com.twisleton.gathering.dtos.Message;
+import com.twisleton.gathering.dtos.User;
+import com.twisleton.gathering.dtos.World;
+import com.twisleton.gathering.persistence.UserPersistence;
 import com.twisleton.gathering.server.GatheringServer;
 import org.java_websocket.WebSocket;
 import org.slf4j.Logger;
@@ -12,7 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PreDestroy;
 import java.awt.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,20 +27,29 @@ public class GameService {
 
     private final Logger logger = LoggerFactory.getLogger(GatheringServer.class);
     private final World world;
+    private final Path userSavePath;
     private final ArrayList<WebSocket> connections;
     private final int worldMaxXCoordinate;
     private final int worldMaxYCoordinate;
     private final Gson gson = new Gson();
 
     public GameService(@Value("${world.x.limit:100}") int worldMaxXCoordinate,
-                       @Value("${world.y.limit:100}") int worldMaxYCoordinate) {
+                       @Value("${world.y.limit:100}") int worldMaxYCoordinate,
+                       @Value("${user.save.path:gamedata/users.json}") String userSavePath) {
         this.worldMaxXCoordinate = worldMaxXCoordinate;
         this.worldMaxYCoordinate = worldMaxYCoordinate;
+        this.userSavePath = Paths.get(userSavePath);
+        HashMap<String, User> users = UserPersistence.loadUsers(this.userSavePath);
         world = new World(
                 worldMaxXCoordinate,
                 worldMaxYCoordinate,
-                new HashMap<String, User>());
+                users);
         connections = new ArrayList<WebSocket>();
+    }
+
+    @PreDestroy
+    public void persistOnShutdown() {
+        UserPersistence.saveUsers(world.users(), userSavePath);
     }
 
     public void handleUserConnection(WebSocket socket) {
