@@ -5,7 +5,7 @@ export function Canvas(socket) {
   let world;
 
   const canvasRef = React.createRef();
-  const playerCanvasRef = React.createRef();
+  // const playerCanvasRef = React.createRef();
 
   const resized = () => {
     canvasRef.current.width = window.innerWidth;
@@ -17,7 +17,7 @@ export function Canvas(socket) {
     let parsed = JSON.parse(message.data);
     if(parsed.id === 'world') {
       world = WorldBuilder(parsed);
-      drawUsers(playerCanvasRef.current, world);
+      drawUsers(canvasRef.current, world);
     }
   }
 
@@ -36,7 +36,7 @@ export function Canvas(socket) {
 
   return <div id="wrapper">
     <canvas ref={canvasRef}></canvas>
-    <canvas ref={playerCanvasRef}></canvas>
+    {/* <canvas ref={playerCanvasRef}></canvas> */}
     </div>
 }
 
@@ -44,6 +44,7 @@ function drawGrid(canvas) {
   const cellRows = 10;
   const ctx = canvas.getContext('2d');
 
+  ctx.beginPath();
   ctx.strokeStyle = '#FF00FF';
   const incX = canvas.width / cellRows;
   for (let i = 0; i <= canvas.width; i += incX) {
@@ -57,22 +58,17 @@ function drawGrid(canvas) {
     ctx.lineTo(canvas.width, i);
     ctx.stroke();
   }
+  ctx.closePath();
   console.log("done");
 }
 
 function drawUsers(canvas, world) {
   const ctx = canvas.getContext('2d');
-  ctx.strokeStyle = '#00FF00';
   // ctx.moveTo(100, 0);
   //   ctx.lineTo(100, canvas.height);
   //   ctx.stroke();
   for(var user in world.users) {
-    let playerXPosition = world.users[user].position.x;
-    let playerYPosition = world.users[user].position.y;
-    console.log(playerYPosition);
-    ctx.moveTo(playerXPosition, playerYPosition);
-    ctx.lineTo(playerXPosition+10, playerYPosition+10);
-    ctx.stroke();
+    drawUser(ctx, world, user);
   }
   // console.log(world.users.[0]);
 
@@ -93,4 +89,22 @@ function drawUsers(canvas, world) {
   //   ctx.stroke();
   // }
   console.log("finished drawing users");
+}
+
+function drawUser(ctx, world, user) {
+  // todo: move this to a better location
+  // left this as a variable so it could
+  // easily be changed in the future
+  const playerSize = 20;
+
+  ctx.beginPath();
+  let playerXPosition = world.users[user].position.x;
+  let playerYPosition = world.users[user].position.y;
+  // possible todo: assign each player a different color
+  // let playerColor = world.users[user].color;
+  ctx.fillStyle = '#00FF00';
+  console.log(playerYPosition);
+  ctx.fillRect(playerXPosition - (playerSize / 2), playerYPosition - (playerSize / 2), playerSize, playerSize);
+  ctx.stroke();
+  ctx.closePath();
 }
