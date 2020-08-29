@@ -25,7 +25,11 @@ public class UserPersistence {
             BufferedReader bufferedReader = new BufferedReader(new FileReader(path.toFile()));
             Type type = new TypeToken<HashMap<String, User>>() {
             }.getType();
-            return gson.fromJson(bufferedReader, type);
+            HashMap<String, User> usersFromFile = gson.fromJson(bufferedReader, type);
+            if(!java.util.Objects.isNull(usersFromFile)){
+                return usersFromFile;
+            }
+            return new HashMap<String, User>();
         } catch (IOException | JsonSyntaxException | JsonIOException e) {
             logger.info("Failed to load users from disk: ", e);
             return new HashMap<String, User>();
