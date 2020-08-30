@@ -1,3 +1,6 @@
 body, html {
+  /* remove any default margins */
   margin: 0;
+  /* hide scrollbars */
+  overflow: hidden;
 }
