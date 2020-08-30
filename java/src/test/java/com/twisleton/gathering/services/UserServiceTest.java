@@ -24,9 +24,4 @@ class UserServiceTest {
         assertThat(Objects.isNull(users), is(false));
         assertThat(users.values().isEmpty(), is(true));
     }
-
-    @Test
-    public void saveUsers() {
-        UserPersistence.saveUsers();
-    }
 }
