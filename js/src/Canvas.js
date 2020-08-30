@@ -1,5 +1,6 @@
 import React from 'react';
 import { WorldBuilder } from './services/WorldBuilder';
+import GlobalStyles from "./styles/global";
 
 export function Canvas(socket) {
   let world;
@@ -32,11 +33,9 @@ export function Canvas(socket) {
     }
   });
 
-  
-
   return <div id="wrapper">
     <canvas ref={canvasRef}></canvas>
-    {/* <canvas ref={playerCanvasRef}></canvas> */}
+    <GlobalStyles/>
     </div>
 }
 
