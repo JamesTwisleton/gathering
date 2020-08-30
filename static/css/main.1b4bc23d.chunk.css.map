@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.css"],"names":[],"mappings":"AAAA,UAEE,QAAS,CAET,eACF","file":"main.1b4bc23d.chunk.css","sourcesContent":["body, html {\n  /* remove any default margins */\n  margin: 0;\n  /* hide scrollbars */\n  overflow: hidden;\n}\n"]}
