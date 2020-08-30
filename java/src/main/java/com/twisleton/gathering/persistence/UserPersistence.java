@@ -22,8 +22,8 @@ public class UserPersistence {
 
     public static HashMap<String, User> loadUsers(Path path) {
         try {
-            BufferedReader bufferedReader = new BufferedReader(new FileReader(path.toFile()));
-            Type type = new TypeToken<HashMap<String, User>>() {
+            var bufferedReader = new BufferedReader(new FileReader(path.toFile()));
+            var type = new TypeToken<HashMap<String, User>>() {
             }.getType();
             HashMap<String, User> usersFromFile = gson.fromJson(bufferedReader, type);
             if(!java.util.Objects.isNull(usersFromFile)){
@@ -38,7 +38,7 @@ public class UserPersistence {
 
     public static void saveUsers(HashMap<String, User> users, Path path) {
         try {
-            FileWriter fileWriter = new FileWriter(path.toFile());
+            var fileWriter = new FileWriter(path.toFile());
             gson.toJson(users, fileWriter);
             fileWriter.close();
         } catch (IOException e) {
