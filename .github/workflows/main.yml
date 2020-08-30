@@ -1,6 +1,7 @@
 name: Pages deployment
 on:
   push:
+    paths: ./js
     branches:
       - master
 
