@@ -1,4 +1,7 @@
 name: Pages deployment
+defaults:
+  run:
+    working-directory: ./js
 on:
   push:
     paths: ./js
@@ -18,10 +21,8 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - name: Install Packages
-      working-directory: ./js
       run: npm install
     - name: Build page
-      working-directory: ./js
       run: npm run build
     - name: Deploy to gh-pages
       uses: peaceiris/actions-gh-pages@v3
