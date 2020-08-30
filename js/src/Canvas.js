@@ -3,7 +3,6 @@ import { WorldBuilder } from './services/WorldBuilder';
 
 export function Canvas(socket) {
   let world;
-  let wow;
 
   const canvasRef = React.createRef();
   // const playerCanvasRef = React.createRef();
