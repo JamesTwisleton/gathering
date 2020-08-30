@@ -4,7 +4,8 @@ defaults:
     working-directory: ./js
 on:
   push:
-    paths: ./js
+    paths-ignore:
+      - "java/**"
     branches:
       - master
 
