@@ -21,6 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
+import java.util.Random;
 
 @Service
 public class GameService {
@@ -70,13 +71,13 @@ public class GameService {
     }
 
     private void handleNewUser(String id) {
-        world.users().put(id, new User(id, generateRandomCoordinates(), Instant.now().toString()));
+        world.users().put(id, new User(id, generateRandomCoordinates(), generateRandomColor(), Instant.now().toString()));
         logger.info("User {} added to world!", id);
     }
 
     private void handleExistingUser(User user) {
         User existingUserWithUpdatedConnectionTime =
-                new User(user.id(), user.position(), Instant.now().toString());
+                new User(user.id(), user.position(), user.color(), Instant.now().toString());
         world.users().put(user.id(), existingUserWithUpdatedConnectionTime);
         logger.info("User {} connected at {}, last connection was {}",
                 user.id(),
@@ -115,7 +116,7 @@ public class GameService {
             case LEFT -> newPosition = new Point(playerX - 1, playerY);
             case RIGHT -> newPosition = new Point(playerX + 1, playerY);
         }
-        world.users().put(user.id(), new User(user.id(), newPosition, user.lastConnectionTime()));
+        world.users().put(user.id(), new User(user.id(), newPosition, user.color(), user.lastConnectionTime()));
         updateClientMaps();
     }
 
@@ -127,5 +128,17 @@ public class GameService {
 
     private Point generateRandomCoordinates() {
         return new Point((int) ((Math.random() * (worldMaxXCoordinate)) + 0), (int) ((Math.random() * (worldMaxYCoordinate)) + 0));
+    }
+
+    // todo - probably best to prevent colors that are too light from being generated
+    private String generateRandomColor() {
+        Random r = new Random();
+        StringBuilder sb = new StringBuilder("#");
+        while (sb.length() < 6) {
+            sb.append(Integer.toHexString(r.nextInt()));
+        }
+
+        // prevent anything longer than 7
+        return sb.toString().substring(0, 7);
     }
 }
