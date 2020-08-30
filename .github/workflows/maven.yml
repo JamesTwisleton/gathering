@@ -6,9 +6,11 @@ name: Java CI with Maven
 on:
   push:
     paths: ./java
-    branches: [ master ]
+    branches:
+      - master
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
 
 jobs:
   build:

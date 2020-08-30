@@ -4,10 +4,12 @@ defaults:
       working-directory: ./js
 on:
   push:
-      paths: ./js
-      branches: [ master ]
+    paths: ./js
+    branches:
+      - master
   pull_request:
-      branches: [ master ]
+    branches:
+      - master
 
 jobs:
   build:
