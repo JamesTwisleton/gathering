@@ -1,5 +1,4 @@
-name: React app deployment
-
+name: Pages deployment
 on:
   push:
     branches: [ master ]
@@ -7,12 +6,25 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
-    
+    strategy:
+      matrix:
+        node-version: [12.x]
     steps:
-    - uses: actions/checkout@v2
-
-    - name: Deploy react app to github pages
-      uses: JamesTwisleton/gathering/deploy-react-to-ghpages@v1.0.1
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: Install Packages
+      working-directory: ./js
+      run: npm install
+    - name: Build page
+      working-directory: ./js
+      run: npm run build
+    - name: Deploy to gh-pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        deploy_key: ${{ secrets.ACTIONS_DEPLOY_KEY }}
+        publish_dir: ./js/build
