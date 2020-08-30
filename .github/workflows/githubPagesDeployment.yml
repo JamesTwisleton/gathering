@@ -1,4 +1,4 @@
-name: Pages deployment
+name: GitHub Pages deployment
 defaults:
   run:
     working-directory: ./js
