@@ -5,7 +5,8 @@ name: Java CI with Maven
 
 on:
   push:
-    paths: ./java
+    paths-ignore:
+      - "js/**"
     branches:
       - master
   pull_request:
