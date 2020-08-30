@@ -98,11 +98,9 @@ function drawUser(ctx, world, user) {
   const playerSize = 20;
 
   ctx.beginPath();
-  let playerXPosition = world.users[user].position.x;
-  let playerYPosition = world.users[user].position.y;
-  // possible todo: assign each player a different color
-  // let playerColor = world.users[user].color;
-  ctx.fillStyle = '#00FF00';
+  let playerXPosition = (world.users[user].position.x / world.maxX) * window.innerWidth;
+  let playerYPosition = (world.users[user].position.y / world.maxY) * window.innerHeight;
+  ctx.fillStyle = world.users[user].color;
   console.log(playerYPosition);
   ctx.fillRect(playerXPosition - (playerSize / 2), playerYPosition - (playerSize / 2), playerSize, playerSize);
   ctx.stroke();
