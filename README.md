@@ -1,7 +1,8 @@
 # GatherinG
 ![GatheringG Sketch](https://github.com/JamesTwisleton/gathering/blob/master/images/gathering.jpeg)
 
-[## Live demo](http://64.227.45.141:3000/gathering)
+## Live demo
+Pushes to master will trigger a redeployment to the [dev server](http://64.227.45.141:3000/gathering).
 
 ## Development
 ### Requirements
@@ -11,6 +12,7 @@
 
 [Maven](https://maven.apache.org/download.cgi)
 ### Running the server
+Just do it you melt.
 ### Running the client
 If you're not running the server locally, update `.env` with your server address.
 
