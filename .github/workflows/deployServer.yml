@@ -1,5 +1,10 @@
 name: Deploy Java App to Dev Server
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - "js/**"
+    branches:
+      - master
 jobs:
 
   build:
@@ -13,4 +18,4 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
         port: 22
-        script: pkill screen && cd git/gathering && git pull && screen -d -m java -jar --enable-preview java/target/gathering-0.0.1-SNAPSHOT.jar
+        script: pkill java && pkill screen && cd git/gathering && git pull && screen -d -m java -jar --enable-preview java/target/gathering-0.0.1-SNAPSHOT.jar
