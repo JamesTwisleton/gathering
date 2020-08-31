@@ -1,0 +1,24 @@
+name: Deploy React App to Dev Server
+defaults:
+  run:
+    working-directory: ./js
+on:
+  push:
+    paths-ignore:
+      - "java/**"
+    branches:
+      - master
+
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_KEY }} 
+        script: cd git/gathering/js && git pull && npm-install-changed && screen -d -m npm start
