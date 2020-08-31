@@ -17,5 +17,5 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
-        port: 22
-        script: pkill java && pkill screen && cd git/gathering && git pull && screen -d -m java -jar --enable-preview java/target/gathering-0.0.1-SNAPSHOT.jar
+        # script: pkill java && pkill screen && cd git/gathering && git pull && screen -d -m java -jar --enable-preview java/target/gathering-0.0.1-SNAPSHOT.jar
+        script: cd git/gathering && git pull && screen -d -m java -jar --enable-preview java/target/gathering-0.0.1-SNAPSHOT.jar
