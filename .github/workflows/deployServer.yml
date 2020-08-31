@@ -1,4 +1,4 @@
-name: remote ssh command
+name: Deploy Java App to Dev Server
 on: [push]
 jobs:
 
@@ -13,4 +13,4 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
         port: 22
-        script: cd git/gathering && touch itworked.txt
+        script: kill $(jps | grep gathering | awk '{print $1}') && cd git/gathering && git pull && java -jar --enable-preview java/target/gathering-0.0.1-SNAPSHOT.jar
