@@ -11,17 +11,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: kill old javaApp screen
+      - name: log onto dev server, kill old javaApp screen, start new one
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_KEY }}
-          script: pkill -f .* javaApp
-      - name: start new javaApp screen
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_KEY }}
-          script: cd git/gathering/java && git pull -q -f && mvn clean package && screen -S javaApp -d -m java -jar --enable-preview target/gathering-0.0.1-SNAPSHOT.jar
+          script: pkill -f .*javaApp && cd git/gathering/java && git pull -q -f && mvn clean package && screen -S javaApp -d -m java -jar --enable-preview target/gathering-0.0.1-SNAPSHOT.jar

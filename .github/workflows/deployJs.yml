@@ -15,19 +15,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: kill old reactApp screen
+    - name: log onto dev server, kill old reactApp screen, start new one
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
-        script: pkill -f .* reactApp
-    - name: start new reactApp screen
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_KEY }}
-          script: cd git/gathering/js && git pull -q -f && npm-install-changed >/dev/null && rm -f .env && echo REACT_APP_DEV_SERVER_ADDRESS=${{ secrets.SERVER_HOST }} >> .env && screen -S reactApp -d -m npm start
-  
-  
+        script: pkill -f .*reactApp && cd git/gathering/js && git pull -q -f && npm-install-changed >/dev/null && rm -f .env && echo REACT_APP_DEV_SERVER_ADDRESS=${{ secrets.SERVER_HOST }} >> .env && screen -S reactApp -d -m npm start
