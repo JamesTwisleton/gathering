@@ -33,7 +33,7 @@ export function Canvas(socket) {
 
     return (
         <DefaultLayout>
-        <GlobalStyles />
+            <GlobalStyles />
             <div id="wrapper">
                 <canvas ref={canvasRef}></canvas>
             </div>
