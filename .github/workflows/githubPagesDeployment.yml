@@ -1,4 +1,4 @@
-name: GitHub Pages deployment
+name: Deploy React App to GitHub Pages
 defaults:
   run:
     working-directory: ./js
