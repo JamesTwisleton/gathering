@@ -10,22 +10,40 @@ export function Canvas(socket) {
     const resized = () => {
         canvasRef.current.width = window.innerWidth;
         canvasRef.current.height = window.innerHeight;
-        drawGrid(canvasRef.current);
+        drawWorld(canvasRef.current, world);
     };
     const handleMessage = (message) => {
         let parsed = JSON.parse(message.data);
         if (parsed.id === 'world') {
             world = WorldBuilder(parsed);
-            drawUsers(canvasRef.current, world);
+            drawWorld(canvasRef.current, world);
+        }
+    };
+    const handleKeyPress = (event) => {
+        console.log(event.key);
+        switch (event.key) {
+            case 'w':
+                socket.send('{"id": "move","message":"UP"}');
+                break;
+            case 'a':
+                socket.send('{"id": "move","message":"LEFT"}');
+                break;
+            case 's':
+                socket.send('{"id": "move","message":"DOWN"}');
+                break;
+            case 'd':
+                socket.send('{"id": "move","message":"RIGHT"}');
+                break;
         }
     };
 
     React.useEffect(() => {
         resized();
         window.addEventListener('resize', resized);
-        socket.onopen = () => {
-            socket.send('{"id": "move","message":"RIGHT"}');
-        };
+        document.addEventListener('keydown', handleKeyPress);
+        // socket.onopen = () => {
+        //     socket.send('{"id": "move","message":"RIGHT"}');
+        // };
         socket.onmessage = (message) => {
             handleMessage(message);
         };
@@ -39,6 +57,20 @@ export function Canvas(socket) {
             </div>
         </DefaultLayout>
     );
+}
+
+function drawWorld(canvas, world) {
+    clearWorld(canvas);
+    drawGrid(canvas);
+    // only draw if initialized
+    if (world) {
+        drawUsers(canvas, world);
+    }
+}
+
+function clearWorld(canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawGrid(canvas) {
