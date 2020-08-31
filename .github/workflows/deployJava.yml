@@ -16,5 +16,5 @@ jobs:
       with:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_KEY }} 
-        script: screen -S javaApp -d -m cd git/gathering/java && git pull && mvn clean package && java -jar --enable-preview target/gathering-0.0.1-SNAPSHOT.jar
+        key: ${{ secrets.SERVER_KEY }}
+        script: cd git/gathering/java && git pull && mvn clean package && screen -S javaApp -d -m java -jar --enable-preview target/gathering-0.0.1-SNAPSHOT.jar
