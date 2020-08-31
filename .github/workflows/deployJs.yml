@@ -15,17 +15,10 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: kill old javaApp screen
+    - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
-        script: pkill -f .*reactApp
-    - name: start new javaApp screen
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USERNAME }}
-        key: ${{ secrets.SERVER_KEY }}
-        script: cd git/gathering/js && git pull -q -f && npm-install-changed >/dev/null && rm -f .env && echo REACT_APP_DEV_SERVER_ADDRESS=${{ secrets.SERVER_HOST }} >> .env && screen -S reactApp -d -m npm start
+        script: screen -X -S "reactApp" quit >/dev/null && cd git/gathering/js && git pull -q && npm-install-changed >/dev/null && rm -f .env && echo REACT_APP_DEV_SERVER_ADDRESS=${{ secrets.SERVER_HOST }} >> .env && screen -S reactApp -d -m npm start
