@@ -1,11 +1,6 @@
 import { Canvas } from './Canvas';
-import config from './config';
 function App() {
-  let socketAddress = 'ws://localhost:42069';
-  if(config.mode === 'dev') {
-    socketAddress = `ws://${config.devServerAddress}:42069`;
-  }
-  let socket = new WebSocket(socketAddress);
+  let socket = new WebSocket(`ws://${process.env.REACT_APP_DEV_SERVER_ADDRESS}:42069`);
   return Canvas(socket);
 }
 
