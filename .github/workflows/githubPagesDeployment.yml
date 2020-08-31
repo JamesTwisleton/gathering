@@ -25,7 +25,7 @@ jobs:
       run: npm install
     - name: Build page
       env:
-        REACT_APP_DEV_SERVER_ADDRESS: secrets.SERVER_HOST
+        REACT_APP_DEV_SERVER_ADDRESS: ${{ secrets.SERVER_HOST }}
       run: npm run build
     - name: Deploy to gh-pages
       uses: peaceiris/actions-gh-pages@v3
