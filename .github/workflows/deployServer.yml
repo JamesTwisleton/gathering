@@ -13,4 +13,4 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
         port: 22
-        script: whoami
+        script: touch itworked.txt
