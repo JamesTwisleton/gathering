@@ -12,20 +12,17 @@ on:
 jobs:
 
   build:
-    name: Remove old reactApp screen
-    runs-on: ubuntu-latest
-    steps:
-      - name: log onto dev server, kill old reactApp screen, start new one
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          key: ${{ secrets.SERVER_KEY }}
-          script: pkill -f .*reactApp
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: log onto dev server, kill old reactApp screen, start new one
+    - name: kill old javaApp screen
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        key: ${{ secrets.SERVER_KEY }}
+        script: pkill -f .*reactApp
+    - name: start new javaApp screen
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SERVER_HOST }}
