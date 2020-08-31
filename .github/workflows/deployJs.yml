@@ -21,4 +21,4 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
-        script: screen -X -S "reactApp" quit >/dev/null && cd git/gathering/js && git pull -q -f && npm-install-changed >/dev/null && rm -f .env && echo REACT_APP_DEV_SERVER_ADDRESS=${{ secrets.SERVER_HOST }} >> .env && screen -S reactApp -d -m npm start
+        script: cd git/gathering/js && git pull -q -f && npm-install-changed >/dev/null && rm -f .env && echo REACT_APP_DEV_SERVER_ADDRESS=${{ secrets.SERVER_HOST }} >> .env && screen -X -S "reactApp" quit >/dev/null && screen -S reactApp -d -m npm start
