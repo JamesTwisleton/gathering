@@ -1,4 +1,4 @@
-name: Deploy Java App to Dev Servers
+name: Deploy Java App to Dev Server
 on:
   push:
     paths-ignore:
