@@ -1,4 +1,4 @@
-gamedata/users.json
+# gamedata/users.json
 HELP.md
 target/
 !.mvn/wrapper/maven-wrapper.jar
