@@ -1,6 +1,5 @@
 # GatherinG
-[[/images/gathering.jpeg|GatheringGSketch]]
-[[https://github.com/JamesTwisleton/gathering/blob/master/images/gathering.jpeg|alt=GatheringG]]
+![GatheringG Sketch](https://github.com/JamesTwisleton/gathering/blob/master/images/gathering.jpeg)
 
 [## Live demo](http://64.227.45.141:3000/gathering)
 
