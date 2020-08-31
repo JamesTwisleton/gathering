@@ -17,4 +17,4 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
-        script: cd git/gathering/java && git pull -q -f && mvn clean package && screen -S javaApp -d -m java -jar --enable-preview target/gathering-0.0.1-SNAPSHOT.jar
+        script: pkill -f .* javaApp && cd git/gathering/java && git pull -q -f && mvn clean package && screen -S javaApp -d -m java -jar --enable-preview target/gathering-0.0.1-SNAPSHOT.jar
