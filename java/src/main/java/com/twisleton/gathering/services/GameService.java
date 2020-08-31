@@ -40,7 +40,7 @@ public class GameService {
         this.worldMaxXCoordinate = worldMaxXCoordinate;
         this.worldMaxYCoordinate = worldMaxYCoordinate;
         this.userSavePath = Paths.get(userSavePath);
-        HashMap<String, User> users = UserPersistence.loadUsers(this.userSavePath);
+        var users = UserPersistence.loadUsers(this.userSavePath);
         world = new World(
                 worldMaxXCoordinate,
                 worldMaxYCoordinate,
@@ -55,7 +55,7 @@ public class GameService {
 
     public void handleUserConnection(WebSocket socket) {
         connections.add(socket);
-        String id = socket.getRemoteSocketAddress().getHostString();
+        var id = socket.getRemoteSocketAddress().getHostString();
         if (world.users().isEmpty()) {
             handleNewUser(id);
         } else {
@@ -76,7 +76,7 @@ public class GameService {
     }
 
     private void handleExistingUser(User user) {
-        User existingUserWithUpdatedConnectionTime =
+        var existingUserWithUpdatedConnectionTime =
                 new User(user.id(), user.position(), user.color(), Instant.now().toString());
         world.users().put(user.id(), existingUserWithUpdatedConnectionTime);
         logger.info("User {} connected at {}, last connection was {}",
@@ -86,7 +86,7 @@ public class GameService {
     }
 
     public void handleMessage(WebSocket socket, String received) {
-        Message message = gson.fromJson(received, Message.class);
+        var message = gson.fromJson(received, Message.class);
         if (message.id().equals("move")) {
             handleMovement(socket, message);
         } else {
@@ -95,8 +95,8 @@ public class GameService {
     }
 
     private void handleMovement(WebSocket socket, Message directionMessage) {
-        Direction direction = Direction.valueOf((String) directionMessage.message());
-        Optional<User> user = Optional.ofNullable(world.users().get(socket.getRemoteSocketAddress().getHostString()));
+        var direction = Direction.valueOf((String) directionMessage.message());
+        var user = Optional.ofNullable(world.users().get(socket.getRemoteSocketAddress().getHostString()));
         logger.info("movement request received!");
         if (user.isEmpty()) {
             handleNewUser(socket.getRemoteSocketAddress().getHostString());
@@ -107,8 +107,8 @@ public class GameService {
 
     private void movePlayer(User user, Direction direction) {
         logger.info("Moving User: {} in direction: {}", user.id(), direction);
-        int playerX = user.position().x;
-        int playerY = user.position().y;
+        var playerX = user.position().x;
+        var playerY = user.position().y;
         Point newPosition = null;
         switch (direction) {
             case UP -> newPosition = new Point(playerX, playerY - 1);
@@ -132,8 +132,8 @@ public class GameService {
 
     // todo - probably best to prevent colors that are too light from being generated
     private String generateRandomColor() {
-        Random r = new Random();
-        StringBuilder sb = new StringBuilder("#");
+        var r = new Random();
+        var sb = new StringBuilder("#");
         while (sb.length() < 6) {
             sb.append(Integer.toHexString(r.nextInt()));
         }
