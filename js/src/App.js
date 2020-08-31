@@ -1,6 +1,6 @@
 import { Canvas } from './Canvas';
 function App() {
-  let socket = new WebSocket('ws://64.227.45.141:42069');
+  let socket = new WebSocket(`ws://${process.env.REACT_APP_DEV_SERVER_ADDRESS}:42069`);
   return Canvas(socket);
 }
 
