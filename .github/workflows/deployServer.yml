@@ -13,4 +13,4 @@ jobs:
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
         port: 22
-        script: touch itworked.txt
+        script: cd git/gathering && touch itworked.txt
