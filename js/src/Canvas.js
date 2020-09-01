@@ -11,8 +11,9 @@ export function Canvas(socket) {
     const inputBuffer = new InputBuffer();
     const canvasRef = React.createRef();
     const resized = () => {
-        canvasRef.current.width = window.innerWidth;
-        canvasRef.current.height = window.innerHeight;
+        const length = Math.min(window.innerHeight, window.innerWidth);
+        canvasRef.current.width = length;
+        canvasRef.current.height = length;
     };
     const gameLoop = () => {
         sendInputToServer(socket, inputBuffer);
@@ -117,44 +118,55 @@ function drawGrid(canvas) {
     ctx.beginPath();
     ctx.strokeStyle = '#FF00FF';
     const incX = canvas.width / cellRows;
-    for (let i = 0; i <= canvas.width; i += incX) {
+    for (let i = 0; i < canvas.width; i += incX) {
         ctx.moveTo(i, 0);
         ctx.lineTo(i, canvas.height);
         ctx.stroke();
     }
+
+    // ensure last column is drawn
+    ctx.moveTo(canvas.width, 0);
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.stroke();
+
     const incY = canvas.height / cellRows;
     for (let i = 0; i <= canvas.height; i += incY) {
         ctx.moveTo(0, i);
         ctx.lineTo(canvas.width, i);
         ctx.stroke();
     }
+
+    // ensure last row is drawn
+    ctx.moveTo(0, canvas.height);
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.stroke();
+
+    ctx.stroke();
     ctx.closePath();
 }
 
 function drawUsers(canvas, world) {
-    const ctx = canvas.getContext('2d');
     for (var user in world.users) {
-        drawUser(ctx, world, user);
+        drawUser(canvas, world, user);
     }
 }
 
-function drawUser(ctx, world, user) {
-    // todo: move this to a better location
-    // left this as a variable so it could
-    // easily be changed in the future
-    const playerSize = 20;
+function drawUser(canvas, world, user) {
+    const ctx = canvas.getContext('2d');
+    const playerRadius = canvas.width / 20;
 
+    const playerXPosition = (world.users[user].position.x / world.maxX) * canvas.width;
+    const playerYPosition = (world.users[user].position.y / world.maxY) * canvas.height;
     ctx.beginPath();
-    let playerXPosition = (world.users[user].position.x / world.maxX) * window.innerWidth;
-    let playerYPosition = (world.users[user].position.y / world.maxY) * window.innerHeight;
     ctx.fillStyle = world.users[user].color;
-    ctx.fillRect(
-        playerXPosition - playerSize / 2,
-        playerYPosition - playerSize / 2,
-        playerSize,
-        playerSize
+    ctx.arc(
+        playerXPosition,
+        playerYPosition,
+        playerRadius,
+        0,
+        2 * Math.PI
     );
-    ctx.stroke();
+    ctx.fill();
     ctx.closePath();
 }
 /* endregion */
