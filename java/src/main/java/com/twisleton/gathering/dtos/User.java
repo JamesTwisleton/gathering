@@ -1,6 +1,6 @@
 package com.twisleton.gathering.dtos;
 
-import java.awt.*;
+import java.awt.geom.Point2D;
 
-public record User(String id, Point position, String color, String lastConnectionTime) {
+public record User(String id, Point2D.Double position, String color, String lastConnectionTime) {
 };

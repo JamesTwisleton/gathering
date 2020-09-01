@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -33,6 +34,9 @@ public class GameService {
     private final int worldMaxXCoordinate;
     private final int worldMaxYCoordinate;
     private final Gson gson = new Gson();
+
+    private final double playerMoveDistance = 0.25;
+    private final double playerDiagonalMoveDistance = playerMoveDistance * Math.sqrt(2) / 2;
 
     public GameService(@Value("${world.x.limit:100}") int worldMaxXCoordinate,
                        @Value("${world.y.limit:100}") int worldMaxYCoordinate,
@@ -107,14 +111,18 @@ public class GameService {
 
     private void movePlayer(User user, Direction direction) {
         logger.info("Moving User: {} in direction: {}", user.id(), direction);
-        var playerX = user.position().x;
-        var playerY = user.position().y;
-        Point newPosition = null;
+        var playerX = user.position().getX();
+        var playerY = user.position().getY();
+        Point2D.Double newPosition = null;
         switch (direction) {
-            case UP -> newPosition = new Point(playerX, playerY - 1);
-            case DOWN -> newPosition = new Point(playerX, playerY + 1);
-            case LEFT -> newPosition = new Point(playerX - 1, playerY);
-            case RIGHT -> newPosition = new Point(playerX + 1, playerY);
+            case NORTH -> newPosition = new Point2D.Double(playerX, playerY - playerMoveDistance);
+            case SOUTH -> newPosition = new Point2D.Double(playerX, playerY + playerMoveDistance);
+            case WEST -> newPosition = new Point2D.Double(playerX - playerMoveDistance, playerY);
+            case EAST -> newPosition = new Point2D.Double(playerX + playerMoveDistance, playerY);
+            case NORTHEAST -> newPosition = new Point2D.Double(playerX + playerDiagonalMoveDistance, playerY - playerDiagonalMoveDistance);
+            case NORTHWEST -> newPosition = new Point2D.Double(playerX - playerDiagonalMoveDistance, playerY - playerDiagonalMoveDistance);
+            case SOUTHEAST -> newPosition = new Point2D.Double(playerX + playerDiagonalMoveDistance, playerY + playerDiagonalMoveDistance);
+            case SOUTHWEST -> newPosition = new Point2D.Double(playerX - playerDiagonalMoveDistance, playerY + playerDiagonalMoveDistance);
         }
         world.users().put(user.id(), new User(user.id(), newPosition, user.color(), user.lastConnectionTime()));
         updateClientMaps();
@@ -126,15 +134,15 @@ public class GameService {
         }
     }
 
-    private Point generateRandomCoordinates() {
-        return new Point((int) ((Math.random() * (worldMaxXCoordinate)) + 0), (int) ((Math.random() * (worldMaxYCoordinate)) + 0));
+    private Point2D.Double generateRandomCoordinates() {
+        return new Point2D.Double((Math.random() * (worldMaxXCoordinate)) + 0, (Math.random() * (worldMaxYCoordinate)) + 0);
     }
 
     // todo - probably best to prevent colors that are too light from being generated
     private String generateRandomColor() {
         var r = new Random();
         var sb = new StringBuilder("#");
-        while (sb.length() < 6) {
+        while (sb.length() < 7) {
             sb.append(Integer.toHexString(r.nextInt()));
         }
 
