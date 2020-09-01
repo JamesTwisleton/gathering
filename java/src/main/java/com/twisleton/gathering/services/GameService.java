@@ -111,19 +111,30 @@ public class GameService {
 
     private void movePlayer(User user, Direction direction) {
         logger.info("Moving User: {} in direction: {}", user.id(), direction);
-        var playerX = user.position().getX();
-        var playerY = user.position().getY();
-        Point2D.Double newPosition = null;
+        double difX = 0, difY = 0;
         switch (direction) {
-            case NORTH -> newPosition = new Point2D.Double(playerX, playerY - playerMoveDistance);
-            case SOUTH -> newPosition = new Point2D.Double(playerX, playerY + playerMoveDistance);
-            case WEST -> newPosition = new Point2D.Double(playerX - playerMoveDistance, playerY);
-            case EAST -> newPosition = new Point2D.Double(playerX + playerMoveDistance, playerY);
-            case NORTHEAST -> newPosition = new Point2D.Double(playerX + playerDiagonalMoveDistance, playerY - playerDiagonalMoveDistance);
-            case NORTHWEST -> newPosition = new Point2D.Double(playerX - playerDiagonalMoveDistance, playerY - playerDiagonalMoveDistance);
-            case SOUTHEAST -> newPosition = new Point2D.Double(playerX + playerDiagonalMoveDistance, playerY + playerDiagonalMoveDistance);
-            case SOUTHWEST -> newPosition = new Point2D.Double(playerX - playerDiagonalMoveDistance, playerY + playerDiagonalMoveDistance);
+            case NORTH -> difY = -playerMoveDistance;
+            case SOUTH -> difY = playerMoveDistance;
+            case WEST -> difX = -playerMoveDistance;
+            case EAST -> difX = playerMoveDistance;
+            case NORTHEAST -> {
+                difX = playerDiagonalMoveDistance;
+                difY = -playerDiagonalMoveDistance;
+            }
+            case NORTHWEST -> {
+                difX = -playerDiagonalMoveDistance;
+                difY = -playerDiagonalMoveDistance;
+            }
+            case SOUTHEAST -> {
+                difX = playerDiagonalMoveDistance;
+                difY = playerDiagonalMoveDistance;
+            }
+            case SOUTHWEST -> {
+                difX = -playerDiagonalMoveDistance;
+                difY = playerDiagonalMoveDistance;
+            }
         }
+        Point2D.Double newPosition = checkPathing(user.position(), difX, difY);
         world.users().put(user.id(), new User(user.id(), newPosition, user.color(), user.lastConnectionTime()));
         updateClientMaps();
     }
@@ -138,8 +149,27 @@ public class GameService {
         return new Point2D.Double((Math.random() * (worldMaxXCoordinate)) + 0, (Math.random() * (worldMaxYCoordinate)) + 0);
     }
 
-    // todo - probably best to prevent colors that are too light from being generated
-    private String generateRandomColor() {
+    /**
+     * The goal of this method is to handle the pathing during a player move.
+     * This would include things such as collisions with other players, but
+     * for now, I'm just doing the world coordinates because when I am testing
+     * I don't want my characters flying off the screen.
+     * @return if the move is invalid, the user's original location; else, a new location from the move
+     */
+    private Point2D.Double checkPathing(Point2D.Double currentPosition, double difX, double difY) {
+        double newX = Math.max(0, Math.min(currentPosition.getX() + difX, world.maxX()));
+        double newY = Math.max(0, Math.min(currentPosition.getY() + difY, world.maxY()));
+        return new Point2D.Double(newX, newY);
+    }
+
+    /**
+     * private static helper method to generate a random hexadecimal color code
+     * simplest way I could think of to differentiate players, probably a set
+     * color list or something like that would be better, but this works well
+     * enough for testing and offers some basic variety.
+     * @return a HTML-compatible hexadecimal color code
+     */
+    private static String generateRandomColor() {
         var r = new Random();
         var sb = new StringBuilder("#");
         while (sb.length() < 7) {
