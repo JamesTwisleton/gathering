@@ -1,6 +1,5 @@
 #!/bin/bash
 pkill -f .*javaApp
-cd git/gathering
 git reset --hard
 git pull
 mvn clean package

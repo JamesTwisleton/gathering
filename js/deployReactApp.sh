@@ -1,6 +1,5 @@
 #!/bin/bash
 pkill -f .*reactApp
-cd git/gathering
 git reset --hard
 git pull
 npm-install-changed >/dev/null
