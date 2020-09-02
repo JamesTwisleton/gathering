@@ -21,4 +21,4 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
-        script: rm -f js/.env && echo REACT_APP_DEV_SERVER_ADDRESS=${{ secrets.SERVER_HOST }} >> js/.env && js/deployReactApp.sh
+        script: rm -f git/gathering/js/.env && echo REACT_APP_DEV_SERVER_ADDRESS=${{ secrets.SERVER_HOST }} >> git/gathering/js/.env && js/deployReactApp.sh

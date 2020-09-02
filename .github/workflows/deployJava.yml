@@ -17,4 +17,4 @@ jobs:
         host: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         key: ${{ secrets.SERVER_KEY }}
-        script: java/deployJavaApp.sh
+        script: git/gathering/java/deployJavaApp.sh
