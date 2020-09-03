@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -33,6 +34,9 @@ public class GameService {
     private final int worldMaxXCoordinate;
     private final int worldMaxYCoordinate;
     private final Gson gson = new Gson();
+
+    private final double playerMoveDistance = 0.25;
+    private final double playerDiagonalMoveDistance = playerMoveDistance * Math.sqrt(2) / 2;
 
     public GameService(@Value("${world.x.limit:100}") int worldMaxXCoordinate,
                        @Value("${world.y.limit:100}") int worldMaxYCoordinate,
@@ -107,15 +111,30 @@ public class GameService {
 
     private void movePlayer(User user, Direction direction) {
         logger.info("Moving User: {} in direction: {}", user.id(), direction);
-        var playerX = user.position().x;
-        var playerY = user.position().y;
-        Point newPosition = null;
+        double difX = 0, difY = 0;
         switch (direction) {
-            case UP -> newPosition = new Point(playerX, playerY - 1);
-            case DOWN -> newPosition = new Point(playerX, playerY + 1);
-            case LEFT -> newPosition = new Point(playerX - 1, playerY);
-            case RIGHT -> newPosition = new Point(playerX + 1, playerY);
+            case NORTH -> difY = -playerMoveDistance;
+            case SOUTH -> difY = playerMoveDistance;
+            case WEST -> difX = -playerMoveDistance;
+            case EAST -> difX = playerMoveDistance;
+            case NORTHEAST -> {
+                difX = playerDiagonalMoveDistance;
+                difY = -playerDiagonalMoveDistance;
+            }
+            case NORTHWEST -> {
+                difX = -playerDiagonalMoveDistance;
+                difY = -playerDiagonalMoveDistance;
+            }
+            case SOUTHEAST -> {
+                difX = playerDiagonalMoveDistance;
+                difY = playerDiagonalMoveDistance;
+            }
+            case SOUTHWEST -> {
+                difX = -playerDiagonalMoveDistance;
+                difY = playerDiagonalMoveDistance;
+            }
         }
+        Point2D.Double newPosition = checkPathing(user.position(), difX, difY);
         world.users().put(user.id(), new User(user.id(), newPosition, user.color(), user.lastConnectionTime()));
         updateClientMaps();
     }
@@ -126,15 +145,34 @@ public class GameService {
         }
     }
 
-    private Point generateRandomCoordinates() {
-        return new Point((int) ((Math.random() * (worldMaxXCoordinate)) + 0), (int) ((Math.random() * (worldMaxYCoordinate)) + 0));
+    private Point2D.Double generateRandomCoordinates() {
+        return new Point2D.Double((Math.random() * (worldMaxXCoordinate)) + 0, (Math.random() * (worldMaxYCoordinate)) + 0);
     }
 
-    // todo - probably best to prevent colors that are too light from being generated
-    private String generateRandomColor() {
+    /**
+     * The goal of this method is to handle the pathing during a player move.
+     * This would include things such as collisions with other players, but
+     * for now, I'm just doing the world coordinates because when I am testing
+     * I don't want my characters flying off the screen.
+     * @return if the move is invalid, the user's original location; else, a new location from the move
+     */
+    private Point2D.Double checkPathing(Point2D.Double currentPosition, double difX, double difY) {
+        double newX = Math.max(0, Math.min(currentPosition.getX() + difX, world.maxX()));
+        double newY = Math.max(0, Math.min(currentPosition.getY() + difY, world.maxY()));
+        return new Point2D.Double(newX, newY);
+    }
+
+    /**
+     * private static helper method to generate a random hexadecimal color code
+     * simplest way I could think of to differentiate players, probably a set
+     * color list or something like that would be better, but this works well
+     * enough for testing and offers some basic variety.
+     * @return a HTML-compatible hexadecimal color code
+     */
+    private static String generateRandomColor() {
         var r = new Random();
         var sb = new StringBuilder("#");
-        while (sb.length() < 6) {
+        while (sb.length() < 7) {
             sb.append(Integer.toHexString(r.nextInt()));
         }
 
