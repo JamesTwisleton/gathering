@@ -35,7 +35,7 @@ public class GatheringServer extends WebSocketServer {
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         logger.info("Connection opened from {}", webSocket.getRemoteSocketAddress());
-        gameService.handleUserConnection(webSocket);
+        gameService.handleUserConnection(webSocket, clientHandshake);
     }
 
     @Override

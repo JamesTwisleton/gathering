@@ -8,6 +8,7 @@ import com.twisleton.gathering.dtos.World;
 import com.twisleton.gathering.persistence.UserPersistence;
 import com.twisleton.gathering.server.GatheringServer;
 import org.java_websocket.WebSocket;
+import org.java_websocket.handshake.ClientHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,9 +58,9 @@ public class GameService {
         UserPersistence.saveUsers(world.users(), userSavePath);
     }
 
-    public void handleUserConnection(WebSocket socket) {
+    public void handleUserConnection(WebSocket socket, ClientHandshake clientHandshake) {
         connections.add(socket);
-        var id = socket.getRemoteSocketAddress().getHostString();
+        var id = socket.getRemoteSocketAddress().getHostString() + clientHandshake.getFieldValue("User-Agent");
         if (world.users().isEmpty()) {
             handleNewUser(id);
         } else {
