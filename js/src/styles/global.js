@@ -30,4 +30,8 @@ export default createGlobalStyle`
   button {
     cursor: pointer;
   }
+  canvas {
+    display: block;
+    margin: auto;
+  }
 `;
