@@ -1,15 +1,29 @@
-import React from 'react';
+import React, { useRef } from 'react'
 import { WorldBuilder } from './services/WorldBuilder';
 import GlobalStyles from './styles/global';
 import DefaultLayout from './pages/layouts/default';
 import { InputBuffer } from './objects/InputBuffer';
+import { v4 as uuidv4 } from 'uuid';
+
+export function checkOrCreateUser() {
+    const id = localStorage.get('gatheringUserId');
+    if (localId !== null) {
+        return id;
+    }
+    const newId = uuidv4();
+    localStorage.set('gatheringUserId', newId);
+    return newId;
+}
 
 export function Canvas(socket) {
+    localStorage.
+        console.log();
 
     let world;
     // buffer for keypress until sent by server
     const inputBuffer = new InputBuffer();
     const canvasRef = React.createRef();
+
     const resized = () => {
         const length = Math.min(window.innerHeight, window.innerWidth);
         canvasRef.current.width = length;
@@ -81,6 +95,7 @@ export function Canvas(socket) {
     return (
         <DefaultLayout>
             <GlobalStyles />
+            {refContainer}
             <div id="wrapper">
                 <canvas ref={canvasRef}></canvas>
             </div>

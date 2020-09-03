@@ -14,29 +14,32 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
+
 
 public class UserPersistence {
     private static final Logger logger = LoggerFactory.getLogger(UserPersistence.class);
     private static final Gson gson = new Gson();
 
-    public static HashMap<String, User> loadUsers(Path path) {
+    public static Set<User> loadUsers(Path path) {
         try {
             var bufferedReader = new BufferedReader(new FileReader(path.toFile()));
-            var type = new TypeToken<HashMap<String, User>>() {
-            }.getType();
-            HashMap<String, User> usersFromFile = gson.fromJson(bufferedReader, type);
-            if(!java.util.Objects.isNull(usersFromFile)){
-                return usersFromFile;
-            }
-            return new HashMap<String, User>();
-        } catch (IOException | JsonSyntaxException | JsonIOException e) {
-            logger.info("Failed to load users from disk: ", e);
-            return new HashMap<String, User>();
+            var type = new TypeToken<Set<User>>() {}.getType();
+            Set<User> usersFromFile = gson.fromJson(bufferedReader, type);
+
+            return usersFromFile;
+        } catch (IOException e) {
+            logger.warn("failed to load users from disk; created empty user set", e);
+            return Collections.emptySet();
+        } catch (JsonSyntaxException | JsonIOException e) {
+            logger.error("Failed to load users from disk: ", e);
+            return Collections.emptySet();
         }
     }
 
-    public static void saveUsers(HashMap<String, User> users, Path path) {
+    public static void saveUsers(Set<User> users, Path path) {
         try {
             var fileWriter = new FileWriter(path.toFile());
             gson.toJson(users, fileWriter);
