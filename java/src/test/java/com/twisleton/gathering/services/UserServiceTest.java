@@ -14,14 +14,14 @@ class UserServiceTest {
     @Test
     public void givenUsersFileExistsOnDisk_whenLoadingUsers_UsersFromDiskAreLoaded() {
         var users = UserPersistence.loadUsers(Paths.get("src/test/resources/users.json"));
-        assertThat(users.values().isEmpty(), is(false));
-        assertThat(users.containsKey("0:0:0:0:0:0:0:1"), is(true));
+        assertThat(users.isEmpty(), is(false));
     }
 
     @Test
     public void givenUsersFileDoesntExist_whenLoadingUsers_WorldHasEmptyUsers() {
         var users = UserPersistence.loadUsers(Paths.get("no/file/here.json"));
         assertThat(Objects.isNull(users), is(false));
-        assertThat(users.values().isEmpty(), is(true));
+        assertThat(users.isEmpty(), is(true));
     }
+
 }
