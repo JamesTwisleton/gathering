@@ -5,7 +5,6 @@ import com.twisleton.gathering.persistence.UserPersistence;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PreDestroy;
 import java.awt.geom.Point2D;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -24,10 +23,10 @@ public class UserService {
     private final int worldMaxYCoordinate;
 
     public UserService(
-            @Value("${user.save.path:gamedata/users.json}") String userSavePath,
-                    @Value("${world.x.limit:100}") int worldMaxXCoordinate,
-                    @Value("${world.y.limit:100}") int worldMaxYCoordinate
-            ) {
+        @Value("${user.save.path:gamedata/users.json}") String userSavePath,
+        @Value("${world.x.limit:100}") int worldMaxXCoordinate,
+        @Value("${world.y.limit:100}") int worldMaxYCoordinate
+        ) {
         this.worldMaxXCoordinate = worldMaxXCoordinate;
         this.worldMaxYCoordinate = worldMaxYCoordinate;
 
@@ -36,7 +35,6 @@ public class UserService {
         this.connectedUsers = new HashSet<>();
     }
 
-    @PreDestroy
     public void saveUsers() {
         UserPersistence.saveUsers(this.allUsers, this.userSavePath);
     }
@@ -44,13 +42,11 @@ public class UserService {
     public void connectUser(UUID userId) {
         final var existingUser = this.findById(userId);
         existingUser.ifPresentOrElse(
-                user -> {
-                    connectedUsers.add(user);
-                    allUsers.add(user);
-                },
+                connectedUsers::add,
                 () -> {
                     var user = this.generateNewUser(userId);
                     connectedUsers.add(user);
+                    allUsers.add(user);
                 }
         );
     }
@@ -59,15 +55,6 @@ public class UserService {
         return allUsers.stream().filter(u ->
             u.id().equals(userId)
         ).findAny();
-    }
-
-    private User generateNewUser(UUID newUserId) {
-        return new User(
-                newUserId,
-                generateRandomCoordinates(),
-                generateRandomColor(),
-                Instant.now().toString()
-        );
     }
 
     public void disconnectUser(User user) {
@@ -79,7 +66,19 @@ public class UserService {
     }
 
     private Point2D.Double generateRandomCoordinates() {
-        return new Point2D.Double((Math.random() * (worldMaxXCoordinate)) + 0, (Math.random() * (worldMaxYCoordinate)) + 0);
+        return new Point2D.Double(
+            (Math.random() * (worldMaxXCoordinate)) + 0,
+            (Math.random() * (worldMaxYCoordinate)) + 0
+            );
+    }
+
+    private User generateNewUser(UUID newUserId) {
+        return new User(
+                newUserId,
+                generateRandomCoordinates(),
+                generateRandomColor(),
+                Instant.now().toString()
+        );
     }
 
     /**

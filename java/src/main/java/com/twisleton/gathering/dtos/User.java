@@ -9,4 +9,15 @@ public record User(
         String color,
         String lastConnectionTime
 ) {
-};
+
+    public User updatePosition(Point2D.Double newPosition) {
+        return new User(
+            this.id,
+            newPosition,
+            color,
+            lastConnectionTime
+        );
+    }
+
+}
+
