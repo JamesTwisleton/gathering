@@ -1,11 +1,9 @@
 import React from 'react';
-import { WorldBuilder } from './services/WorldBuilder';
-import GlobalStyles from './styles/global';
-import DefaultLayout from './pages/layouts/default';
-import { InputBuffer } from './objects/InputBuffer';
+import { WorldBuilder } from '../services/WorldBuilder';
+import { InputBuffer } from '../objects/InputBuffer';
 
-export function Canvas(socket) {
-
+export default function Canvas(props) {
+    const socket = props.socket;
     let world;
     // buffer for keypress until sent by server
     const inputBuffer = new InputBuffer();
@@ -79,12 +77,9 @@ export function Canvas(socket) {
     });
 
     return (
-        <DefaultLayout>
-            <GlobalStyles />
-            <div id="wrapper">
-                <canvas ref={canvasRef}></canvas>
-            </div>
-        </DefaultLayout>
+        <div id="wrapper">
+            <canvas ref={canvasRef}></canvas>
+        </div>
     );
 }
 
@@ -159,13 +154,7 @@ function drawUser(canvas, world, user) {
     const playerYPosition = (world.users[user].position.y / world.maxY) * canvas.height;
     ctx.beginPath();
     ctx.fillStyle = world.users[user].color;
-    ctx.arc(
-        playerXPosition,
-        playerYPosition,
-        playerRadius,
-        0,
-        2 * Math.PI
-    );
+    ctx.arc(playerXPosition, playerYPosition, playerRadius, 0, 2 * Math.PI);
     ctx.fill();
     ctx.closePath();
 }
