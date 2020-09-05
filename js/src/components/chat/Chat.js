@@ -1,10 +1,19 @@
 import React, { Component } from 'react';
 import { Launcher } from 'react-chat-window';
+import { ChatWrapper } from './styles';
 export default class Chat extends Component {
     constructor() {
         super();
         this.state = {
-            messageList: [],
+            messageList: [
+                {
+                    author: 'Zump',
+                    type: 'text',
+                    data: {
+                      text: 'Welcome to GatherinG'
+                    }
+                  }
+            ],
         };
     }
 
@@ -32,15 +41,18 @@ export default class Chat extends Component {
     render() {
         return (
             <div>
-                <Launcher isOpen="true"
-                    agentProfile={{
-                        teamName: 'react-chat-window',
-                        imageUrl: 'https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png',
-                    }}
-                    onMessageWasSent={this._onMessageWasSent.bind(this)}
-                    messageList={this.state.messageList}
-                    showEmoji
-                />
+                <ChatWrapper>
+                    <Launcher
+                        agentProfile={{
+                            teamName: 'GatherinG',
+                            imageUrl:
+                                'https://i.imgur.com/2rUfCk5.png',
+                        }}
+                        onMessageWasSent={this._onMessageWasSent.bind(this)}
+                        messageList={this.state.messageList}
+                        showEmoji
+                    />
+                </ChatWrapper>
             </div>
         );
     }

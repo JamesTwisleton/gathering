@@ -77,7 +77,7 @@ export default function Canvas(props) {
     });
 
     return (
-        <div id="wrapper">
+        <div id="canvasWrapper">
             <canvas ref={canvasRef}></canvas>
         </div>
     );
