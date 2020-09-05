@@ -8,6 +8,7 @@ export default function Canvas(props) {
     // buffer for keypress until sent by server
     const inputBuffer = new InputBuffer();
     const canvasRef = React.createRef();
+
     const resized = () => {
         const length = Math.min(window.innerHeight, window.innerWidth);
         canvasRef.current.width = length;

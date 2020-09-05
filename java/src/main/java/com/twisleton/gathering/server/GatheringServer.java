@@ -1,6 +1,9 @@
 package com.twisleton.gathering.server;
 
+import com.twisleton.gathering.dtos.User;
+import com.twisleton.gathering.serveractions.ServerActions;
 import com.twisleton.gathering.services.GameService;
+import com.twisleton.gathering.services.UserService;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
@@ -13,41 +16,62 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class GatheringServer extends WebSocketServer {
 
     private final Logger logger = LoggerFactory.getLogger(GatheringServer.class);
     private final GameService gameService;
+    private final UserService userService;
+    private final Map<InetSocketAddress, User> connectedUsers;
 
-    public GatheringServer(@Value("${port.number:42069}") int port,
-                           @Autowired GameService gameService) {
+    public GatheringServer(
+            @Value("${port.number:42069}") int port,
+            @Autowired GameService gameService,
+            @Autowired UserService userService
+    ) {
         super(new InetSocketAddress(port));
         this.gameService = gameService;
+        this.userService = userService;
         this.start();
+        connectedUsers = Map.of();
     }
 
     @PreDestroy
     public void stopServerOnShutdown() throws IOException, InterruptedException {
+        userService.saveUsers();
         this.stop();
     }
 
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         logger.info("Connection opened from {}", webSocket.getRemoteSocketAddress());
-        gameService.handleUserConnection(webSocket, clientHandshake);
     }
 
     @Override
-    public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-        logger.info("Connection {} closed", i);
-        gameService.handleUserDisconnection(webSocket);
+    public void onClose(WebSocket connection, int i, String s, boolean b) {
+        var userAddress = connection.getRemoteSocketAddress();
+        var user = connectedUsers.get(userAddress);
+        if (user != null) {
+            userService.disconnectUser(user);
+            logger.info("disconnected user {}", userAddress);
+        } else {
+            logger.warn("Tried to disconnect missing user with address {}", userAddress);
+        }
     }
 
     @Override
-    public void onMessage(WebSocket webSocket, String s) {
-        logger.info("Message received from {}:  {}", webSocket.getRemoteSocketAddress(), s);
-        gameService.handleMessage(webSocket, s);
+    public void onMessage(WebSocket webSocket, String messageBody) {
+        logger.info("Message received from {}:  {}", webSocket.getRemoteSocketAddress(), messageBody);
+        var action = gameService.interpretClientMessage(messageBody);
+        if (action instanceof ServerActions.UserConnected userConnected) {
+            connectedUsers.put(
+                    webSocket.getRemoteSocketAddress(),
+                    userConnected.user()
+            );
+        }
     }
 
     @Override
