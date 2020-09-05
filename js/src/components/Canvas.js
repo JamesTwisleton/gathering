@@ -78,19 +78,9 @@ export default function Canvas(props) {
     });
 
     return (
-<<<<<<< HEAD:js/src/components/Canvas.js
         <div id="canvasWrapper">
             <canvas ref={canvasRef}></canvas>
         </div>
-=======
-        <DefaultLayout>
-            <GlobalStyles />
-            {refContainer}
-            <div id="wrapper">
-                <canvas ref={canvasRef}></canvas>
-            </div>
-        </DefaultLayout>
->>>>>>> started refactor:js/src/Canvas.js
     );
 }
 
