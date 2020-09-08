@@ -7,7 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export function checkOrCreateUser() {
     const id = localStorage.get('gatheringUserId');
-    if (localId !== null) {
+    if (id !== null) {
         return id;
     }
     const newId = uuidv4();
@@ -16,8 +16,7 @@ export function checkOrCreateUser() {
 }
 
 export function Canvas(socket) {
-    localStorage.
-        console.log();
+    console.log();
 
     let world;
     // buffer for keypress until sent by server
@@ -95,7 +94,6 @@ export function Canvas(socket) {
     return (
         <DefaultLayout>
             <GlobalStyles />
-            {refContainer}
             <div id="wrapper">
                 <canvas ref={canvasRef}></canvas>
             </div>
@@ -112,12 +110,12 @@ function sendInputToServer(socket, inputBuffer) {
 }
 
 /* region canvas drawing */
-function drawWorld(canvas, world) {
+function drawWorld(canvas, users) {
     clearWorld(canvas);
     drawGrid(canvas);
     // only draw if initialized
-    if (world) {
-        drawUsers(canvas, world);
+    if (users) {
+        drawUsers(canvas, users);
     }
 }
 
@@ -160,8 +158,8 @@ function drawGrid(canvas) {
     ctx.closePath();
 }
 
-function drawUsers(canvas, world) {
-    for (var user in world.users) {
+function drawUsers(canvas, users) {
+    for (let user in users) {
         drawUser(canvas, world, user);
     }
 }

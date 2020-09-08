@@ -29,8 +29,4 @@ public interface ClientMessage {
         };
     }
 
-    default String serialize() {
-        return gson.toJson(this);
-    }
-
 }

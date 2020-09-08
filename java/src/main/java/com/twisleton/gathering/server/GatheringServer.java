@@ -1,7 +1,10 @@
 package com.twisleton.gathering.server;
 
 import com.twisleton.gathering.dtos.User;
+import com.twisleton.gathering.serveractions.ServerAction;
 import com.twisleton.gathering.serveractions.ServerActions;
+import com.twisleton.gathering.servermessages.ServerMessage;
+import com.twisleton.gathering.servermessages.ServerMessages;
 import com.twisleton.gathering.services.GameService;
 import com.twisleton.gathering.services.UserService;
 import org.java_websocket.WebSocket;
@@ -16,8 +19,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class GatheringServer extends WebSocketServer {
@@ -25,7 +30,6 @@ public class GatheringServer extends WebSocketServer {
     private final Logger logger = LoggerFactory.getLogger(GatheringServer.class);
     private final GameService gameService;
     private final UserService userService;
-    private final Map<InetSocketAddress, User> connectedUsers;
 
     public GatheringServer(
             @Value("${port.number:42069}") int port,
@@ -36,7 +40,6 @@ public class GatheringServer extends WebSocketServer {
         this.gameService = gameService;
         this.userService = userService;
         this.start();
-        connectedUsers = Map.of();
     }
 
     @PreDestroy
@@ -55,7 +58,6 @@ public class GatheringServer extends WebSocketServer {
         var userAddress = connection.getRemoteSocketAddress();
         var user = connectedUsers.get(userAddress);
         if (user != null) {
-            userService.disconnectUser(user);
             logger.info("disconnected user {}", userAddress);
         } else {
             logger.warn("Tried to disconnect missing user with address {}", userAddress);
@@ -66,12 +68,7 @@ public class GatheringServer extends WebSocketServer {
     public void onMessage(WebSocket webSocket, String messageBody) {
         logger.info("Message received from {}:  {}", webSocket.getRemoteSocketAddress(), messageBody);
         var action = gameService.interpretClientMessage(messageBody);
-        if (action instanceof ServerActions.UserConnected userConnected) {
-            connectedUsers.put(
-                    webSocket.getRemoteSocketAddress(),
-                    userConnected.user()
-            );
-        }
+        var response = responseToAction(webSocket, action);
     }
 
     @Override
@@ -80,9 +77,25 @@ public class GatheringServer extends WebSocketServer {
                 "Oopsie Woopsie you did a real fucky wucky, now you have to get in the f o r e v e r box: ",
                 e);
     }
-
     @Override
     public void onStart() {
         logger.info("Gathering server started on port {}", this.getPort());
     }
+
+    private Optional<ServerMessage> responseToAction(WebSocket connection, ServerAction action) {
+        if (action instanceof ServerActions.UpdateWorld userConnected) {
+            connectedUsers.put(
+                    connection.getRemoteSocketAddress(),
+                    userConnected.user()
+            );
+            return Optional.of(
+                    new ServerMessages.UpdateWholeWord(Set.copyOf(connectedUsers.values()))
+            );
+        } else if (action instanceof ServerActions.UpdateWorld updateWorld) {
+
+        }
+
+    }
+
+
 }
