@@ -1,8 +1,10 @@
 # GatherinG
+A multi user online experience, purpose TBC
 ![GatheringG Sketch](https://github.com/JamesTwisleton/gathering/blob/master/images/gathering.jpeg)
 
 ## Live demo
-Pushes to master will trigger a redeployment to the [dev server](http://64.227.45.141:3000/gathering).
+[WASD to move](http://64.227.45.141:3000/gathering).
+Pushes to master will trigger a redeployment.
 
 ## Development
 ### Requirements
@@ -12,11 +14,13 @@ Pushes to master will trigger a redeployment to the [dev server](http://64.227.4
 
 [Maven](https://maven.apache.org/download.cgi)
 ### Running the server
-Just do it you melt.
+In the `java` folder:
+`mvn package`
+`java -jar --enable-preview target/gathering-0.0.1-SNAPSHOT.jar`
 ### Running the client
 If you're not running the server locally, update `.env` with your server address.
 
-In the js folder
+In the `js` folder:
 ```node
 npm install
 npm start

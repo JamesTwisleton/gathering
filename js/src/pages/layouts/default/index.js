@@ -1,9 +1,13 @@
 import React from 'react';
-// import PropTypes from 'prop-types';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { Wrapper } from './styles';
+import { NavigationBar } from '../../../components/NavigationBar';
+
 export default function DefaultLayout({ children }) {
-  return <Wrapper>{children}</Wrapper>;
+    return (
+        <>
+            <NavigationBar />
+            <Wrapper>{children}</Wrapper>
+        </>
+    );
 }
-DefaultLayout.propTypes = {
-  // children: PropTypes.element.isRequired,
-};
