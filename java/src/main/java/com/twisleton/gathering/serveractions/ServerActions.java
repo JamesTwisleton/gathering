@@ -16,6 +16,9 @@ public class ServerActions {
     public static record UserMoved(User userWithNewPosition) implements ServerAction {
     }
 
-    public static record UserConnected(InetSocketAddress from, User userWithNewPosition) implements ServerAction {
+    public static record UserConnected(InetSocketAddress from, User user) implements ServerAction {
+    }
+
+    public static record UserDisconnected(InetSocketAddress from) implements ServerAction {
     }
 }

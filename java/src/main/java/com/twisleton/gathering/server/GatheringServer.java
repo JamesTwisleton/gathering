@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class GatheringServer extends WebSocketServer {
@@ -30,6 +27,7 @@ public class GatheringServer extends WebSocketServer {
     private final Logger logger = LoggerFactory.getLogger(GatheringServer.class);
     private final GameService gameService;
     private final UserService userService;
+    private final HashMap<InetSocketAddress, WebSocket> connections;
 
     public GatheringServer(
             @Value("${port.number:42069}") int port,
@@ -40,6 +38,7 @@ public class GatheringServer extends WebSocketServer {
         this.gameService = gameService;
         this.userService = userService;
         this.start();
+        connections = new HashMap<>();
     }
 
     @PreDestroy
@@ -51,17 +50,15 @@ public class GatheringServer extends WebSocketServer {
     @Override
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         logger.info("Connection opened from {}", webSocket.getRemoteSocketAddress());
+        connections.put(webSocket.getRemoteSocketAddress(), webSocket);
     }
 
     @Override
     public void onClose(WebSocket connection, int i, String s, boolean b) {
         var userAddress = connection.getRemoteSocketAddress();
-        var user = connectedUsers.get(userAddress);
-        if (user != null) {
-            logger.info("disconnected user {}", userAddress);
-        } else {
-            logger.warn("Tried to disconnect missing user with address {}", userAddress);
-        }
+        // TODO: naff
+        var disconnectedMessage = new ServerActions.UserDisconnected(userAddress);
+        responseToAction(disconnectedMessage);
     }
 
     @Override
@@ -69,7 +66,16 @@ public class GatheringServer extends WebSocketServer {
         var from = webSocket.getRemoteSocketAddress();
         logger.info("Message received from {}:  {}", from, messageBody);
         var action = gameService.interpretClientMessage(from, messageBody);
-        var response = responseToAction(webSocket, action);
+        var response = responseToAction(action);
+        handleResponse(webSocket, response);
+    }
+
+    private void handleResponse(WebSocket socket, ServerMessage response) {
+        switch (response.getResponseStrategy()) {
+            case RESPOND_ALL -> connections.values()
+                    .forEach(s -> s.send(response.serialize()));
+            case RESPOND_DIRECTLY -> socket.send(response.serialize());
+        }
     }
 
     @Override
@@ -78,24 +84,29 @@ public class GatheringServer extends WebSocketServer {
                 "Oopsie Woopsie you did a real fucky wucky, now you have to get in the f o r e v e r box: ",
                 e);
     }
+
     @Override
     public void onStart() {
         logger.info("Gathering server started on port {}", this.getPort());
     }
 
-    private Optional<ServerMessage> responseToAction(WebSocket connection, ServerAction action) {
-        if (action instanceof ServerActions.UpdateWorld userConnected) {
-            connectedUsers.put(
-                    connection.getRemoteSocketAddress(),
-                    userConnected.user()
-            );
-            return Optional.of(
-                    new ServerMessages.UpdateWholeWord(Set.copyOf(connectedUsers.values()))
-            );
-        } else if (action instanceof ServerActions.UpdateWorld updateWorld) {
+    private ServerMessage responseToAction(ServerAction action) {
+        if (action instanceof ServerActions.UserConnected userConnected) {
+            userService.connectUser(userConnected.from(), userConnected.user());
+            var connectedUsers = userService.connectedUsers();
+            return new ServerMessages.UpdateWholeWord(connectedUsers);
+
+        } else if (action instanceof ServerActions.UserDisconnected disconnectedMessage) {
+            var address = disconnectedMessage.from();
+            connections.remove(address);
+            userService.disconnectUser(address);
+            var userId = userService.findConnectedByAddress(address)
+                    .orElseThrow(() -> new RuntimeException("can't find user for address " + address));
+            return new ServerMessages.UserDisconnected(userId.id());
 
         }
 
+        throw new RuntimeException("no handler for action " + action);
     }
 
 

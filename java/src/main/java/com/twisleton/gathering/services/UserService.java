@@ -25,7 +25,7 @@ public class UserService {
 
     final Path userSavePath;
     Set<User> allUsers;
-    final Map<InetSocketAddress, UUID> connectedUserIds;
+    final Map<InetSocketAddress, User> connectedUsers;
 
     // TODO refactor out to world service or something
     private final int worldMaxXCoordinate;
@@ -41,7 +41,7 @@ public class UserService {
 
         this.userSavePath = Paths.get(userSavePath);
         this.allUsers = new HashSet<>();
-        connectedUserIds = new HashMap<>();
+        connectedUsers = new HashMap<>();
     }
 
     public void saveUsers() {
@@ -49,7 +49,16 @@ public class UserService {
     }
 
     public void connectUser(InetSocketAddress address, User user) {
+        connectedUsers.put(address, user);
+        allUsers.add(user);
+    }
 
+    public void disconnectUser(InetSocketAddress from) {
+        connectedUsers.remove(from);
+    }
+
+    public Set<User> connectedUsers() {
+        return Set.copyOf(connectedUsers.values());
     }
 
     public User getOrCreateUser(UUID userId) {
@@ -63,6 +72,10 @@ public class UserService {
         return allUsers.stream().filter(u ->
                 u.id().equals(userId)
         ).findAny();
+    }
+
+    public Optional<User> findConnectedByAddress(InetSocketAddress from) {
+        return Optional.ofNullable(connectedUsers.get(from));
     }
 
     public void loadUsers() {
@@ -151,5 +164,4 @@ public class UserService {
         // prevent anything longer than 7
         return sb.toString().substring(0, 7);
     }
-
 }
