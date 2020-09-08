@@ -48,6 +48,10 @@ public class UserService {
         UserPersistence.saveUsers(this.allUsers, this.userSavePath);
     }
 
+    public void connectUser(InetSocketAddress address, User user) {
+
+    }
+
     public User getOrCreateUser(UUID userId) {
         var user = this.findById(userId)
                 .orElseGet(() -> this.generateNewUser(userId));

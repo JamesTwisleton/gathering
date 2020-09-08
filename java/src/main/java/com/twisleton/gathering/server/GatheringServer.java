@@ -66,8 +66,9 @@ public class GatheringServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket webSocket, String messageBody) {
-        logger.info("Message received from {}:  {}", webSocket.getRemoteSocketAddress(), messageBody);
-        var action = gameService.interpretClientMessage(messageBody);
+        var from = webSocket.getRemoteSocketAddress();
+        logger.info("Message received from {}:  {}", from, messageBody);
+        var action = gameService.interpretClientMessage(from, messageBody);
         var response = responseToAction(webSocket, action);
     }
 

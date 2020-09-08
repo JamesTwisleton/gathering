@@ -2,6 +2,7 @@ package com.twisleton.gathering.serveractions;
 
 import com.twisleton.gathering.dtos.User;
 
+import java.net.InetSocketAddress;
 import java.util.Set;
 
 public class ServerActions {
@@ -15,4 +16,6 @@ public class ServerActions {
     public static record UserMoved(User userWithNewPosition) implements ServerAction {
     }
 
+    public static record UserConnected(InetSocketAddress from, User userWithNewPosition) implements ServerAction {
+    }
 }

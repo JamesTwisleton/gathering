@@ -7,6 +7,8 @@ import com.twisleton.gathering.serveractions.ServerActions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.net.InetSocketAddress;
+
 @Service
 public class GameService {
 
@@ -18,11 +20,11 @@ public class GameService {
         this.userService = userService;
     }
 
-    public ServerAction interpretClientMessage(String received) {
+    public ServerAction interpretClientMessage(InetSocketAddress from, String received) {
         var message = ClientMessage.parseMessage(received);
         if (message instanceof ClientMessages.UserConnect connectMessage) {
-            userService.connectUser(connectMessage.userId());
-            return new ServerActions.UpdateWorld(userService.connectedUsers);
+            var user = userService.getOrCreateUser(connectMessage.userId());
+            return new ServerActions.UserConnected(from, user);
         }
         if (message instanceof ClientMessages.Move moveMessage) {
             return handleMovement(moveMessage);
