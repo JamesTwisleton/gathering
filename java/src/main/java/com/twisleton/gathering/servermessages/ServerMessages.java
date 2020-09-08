@@ -9,21 +9,13 @@ import java.util.UUID;
 public class ServerMessages {
 
     public static record UpdateWholeWord(Set<User> users) implements ServerMessage {
-        public ServerMessageType type() {
-            return ServerMessageType.UPDATE_WHOLE_WORLD;
-        }
+        public static ServerMessageType type = ServerMessageType.UPDATE_WHOLE_WORLD;
     }
 
     public static record UserMove(UUID userId) implements ServerMessage {
-        public ServerMessageType type() {
-            return ServerMessageType.USER_MOVE;
-        }
     }
 
     public static record UserDisconnected(UUID userId) implements ServerMessage {
-        public ServerMessageType type() {
-            return ServerMessageType.USER_DISCONNECTED;
-        }
     }
 
 }

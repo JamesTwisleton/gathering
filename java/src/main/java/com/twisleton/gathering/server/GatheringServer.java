@@ -51,6 +51,7 @@ public class GatheringServer extends WebSocketServer {
     public void onOpen(WebSocket webSocket, ClientHandshake clientHandshake) {
         logger.info("Connection opened from {}", webSocket.getRemoteSocketAddress());
         connections.put(webSocket.getRemoteSocketAddress(), webSocket);
+        webSocket.send((new ServerMessages.UpdateWholeWord(userService.connectedUsers())).serialize());
     }
 
     @Override
@@ -63,7 +64,7 @@ public class GatheringServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket webSocket, String messageBody) {
-        var from = webSocket.getRemoteSocketAddress();
+            var from = webSocket.getRemoteSocketAddress();
         logger.info("Message received from {}:  {}", from, messageBody);
         var action = gameService.interpretClientMessage(from, messageBody);
         var response = responseToAction(action);
@@ -88,6 +89,7 @@ public class GatheringServer extends WebSocketServer {
     @Override
     public void onStart() {
         logger.info("Gathering server started on port {}", this.getPort());
+        userService.loadUsers();
     }
 
     private ServerMessage responseToAction(ServerAction action) {
@@ -103,7 +105,6 @@ public class GatheringServer extends WebSocketServer {
             var userId = userService.findConnectedByAddress(address)
                     .orElseThrow(() -> new RuntimeException("can't find user for address " + address));
             return new ServerMessages.UserDisconnected(userId.id());
-
         }
 
         throw new RuntimeException("no handler for action " + action);

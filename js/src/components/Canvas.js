@@ -1,6 +1,7 @@
 import React from 'react';
 import { WorldBuilder } from '../services/WorldBuilder';
 import { InputBuffer } from '../objects/InputBuffer';
+import { v4 as uuid } from 'uuid';
 
 export default function Canvas(props) {
     const socket = props.socket;
@@ -21,9 +22,11 @@ export default function Canvas(props) {
     };
     const handleMessage = (message) => {
         let parsed = JSON.parse(message.data);
+        console.log(message.data);
+        debugger;
         if (parsed.id === 'world') {
             world = WorldBuilder(parsed);
-        }
+        } 
     };
     const handleKeyDown = (event) => {
         switch (event.key) {
@@ -73,6 +76,13 @@ export default function Canvas(props) {
         // supposedly the below hook is not the best method of doing things
         // https://css-tricks.com/using-requestanimationframe-with-react-hooks/
         socket.onopen = () => {
+            const body = {
+                type: {
+                    USER_CONNECT: {}
+                },
+                userId: uuid()
+            }
+            socket.send(JSON.stringify(body));
             gameLoop();
         };
     });
@@ -142,8 +152,9 @@ function drawGrid(canvas) {
 }
 
 function drawUsers(canvas, users) {
+    const world = [];
     for (let user in users) {
-        drawUser(canvas, world, user);
+        drawUser(canvas, this.world, user);
     }
 }
 

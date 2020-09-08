@@ -1,6 +1,9 @@
 package com.twisleton.gathering.servermessages;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.lang.reflect.Modifier;
 
 // type tag for deserialization
 enum ServerMessageType {
@@ -19,16 +22,20 @@ enum ServerMessageType {
 
 public interface ServerMessage {
 
-    Gson gson = new Gson();
+    Gson gson = includeStatic();
 
-    ServerMessageType type();
+    static Gson includeStatic() {
+        var builder = new GsonBuilder();
+        builder.excludeFieldsWithModifiers(Modifier.TRANSIENT);
+        return builder.create();
+    }
 
     default String serialize() {
         return gson.toJson(this);
     }
 
     default ResponseStrategy getResponseStrategy() {
-        return type().responseStrategy;
+        return type.responseStrategy;
     }
 
 }
